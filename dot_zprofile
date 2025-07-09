@@ -2,3 +2,5 @@ export XDG_CONFIG_HOME=$HOME/.config
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 VIM="nvim"
+alias vim="nvim"
+alias vi="nvim"
