@@ -1,0 +1,10 @@
+packages:
+  darwin:
+    brews:
+    - 'git'
+    - 'neovim'
+    - 'ripgrep'
+    casks:
+    - 'firefox'
+    - 'ghostty'
+    - 'visual-studio-code'

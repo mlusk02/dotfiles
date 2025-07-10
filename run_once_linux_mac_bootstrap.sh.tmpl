@@ -1,0 +1,56 @@
+#!/bin/bash
+set -e
+echo "[chezmoi] Starting cross-platform package install..."
+
+{{ if eq .chezmoi.os "darwin" }}
+echo "[macOS] Installing packages with Homebrew..."
+
+# Install Homebrew if missing
+if ! command -v brew >/dev/null; then
+  echo "[macOS] Homebrew not found. Installing..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+brew update
+brew install neovim ripgrep git curl unzip
+
+# Install GUI apps
+brew install --cask visual-studio-code firefox
+
+# Install Ghostty
+brew tap ghostty-dev/homebrew-tap
+brew install ghostty
+
+{{ else if eq .chezmoi.os "linux" }}
+echo "[Linux] Installing packages..."
+
+if command -v apt >/dev/null; then
+  sudo apt update
+  sudo apt install -y neovim ripgrep git curl unzip firefox
+
+  # Install VSCode
+  if ! command -v code >/dev/null; then
+    echo "[Linux] Installing VSCode via Microsoft repo..."
+    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+    sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+    sudo apt update
+    sudo apt install -y code
+  fi
+
+  echo "[Linux] Ghostty is not packaged in apt. You can install it manually from https://github.com/ghostty-org/ghostty"
+
+elif command -v pacman >/dev/null; then
+  sudo pacman -Syu --noconfirm neovim ripgrep git curl unzip firefox code
+  echo "[Linux] Ghostty is not available in pacman — manual install recommended."
+
+elif command -v dnf >/dev/null; then
+  sudo dnf install -y neovim ripgrep git curl unzip firefox code
+  echo "[Linux] Ghostty is not available in dnf — manual install recommended."
+
+else
+  echo "[Linux] Unsupported package manager."
+  exit 1
+fi
+{{ end }}
+
+echo "[chezmoi] Package installation complete ✅"
