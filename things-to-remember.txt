@@ -1,1 +1,2 @@
 Add ripgrep as an install
+fix blink, vim.buf.xxx should show things (capabilities?)
